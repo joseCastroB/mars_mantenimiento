@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record id="paperformat_mars_report" model="report.paperformat">
+        <field name="name">Formato MARS Sin Margen</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">0</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+        <field name="disable_shrinking" eval="True"/>
+    </record>
+
+    <record id="action_report_maintenance_mars" model="ir.actions.report">
+        <field name="name">Informe de Mantenimiento MARS</field>
+        <field name="model">maintenance.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mars_mantenimiento.report_maintenance_template</field>
+        <field name="report_file">mars_mantenimiento.report_maintenance_template</field>
+        <field name="paperformat_id" ref="mars_mantenimiento.paperformat_mars_report"/>
+        <field name="binding_model_id" ref="maintenance.model_maintenance_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_maintenance_template">
+        <t t-call="web.html_container">
+            
+            <style>
+                * { box-sizing: border-box !important; }
+                body, html, div.article { margin: 0 !important; padding: 0 !important; }
+                
+                /* Carátula ajustada a 296mm para matar el desbordamiento de wkhtmltopdf */
+                .portada-estricta {
+                    position: relative;
+                    width: 210mm !important;
+                    height: 278mm !important;
+                    max-width: 210mm !important;
+                    max-height: 278 mm !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    page-break-after: always;
+                    overflow: hidden; /* Esto guillotina el milímetro extra */
+                    font-family: 'Arial', sans-serif;
+                }
+
+                .pagina-interna {
+                    width: 210mm !important;
+                    padding: 20mm !important;
+                    font-family: 'Arial', sans-serif;
+                }
+            </style>
+
+            <t t-foreach="docs" t-as="doc">
+                
+                <div class="portada-estricta">
+                    
+                    <img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/report_cover_base.jpg" 
+                         style="position: absolute; top: 0; left: 0; width: 210mm !important; height: 296mm !important; z-index: 1;"/>
+
+                    <div style="position: absolute; top: 0; left: 0; width: 210mm; height: 296mm; z-index: 10;">
+                        
+                    <!--   <img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" 
+                             style="position: absolute; top: 25mm; left: 20mm; width: 45mm;"/> 
+                    -->
+                        <img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" 
+                             style="position: absolute; top: 15mm; right: 25mm; width: 35mm;"/>
+
+                        <div style="position: absolute; top: 60mm; left: 0; width: 100%; text-align: center; font-size: 40pt; font-weight: bold; color: white; text-transform: uppercase;">
+                            <span t-field="doc.mars_client_id.name"/>
+                        </div>
+
+                        <div style="position: absolute; bottom: 45mm; left: 15mm; width: 140mm; font-size: 11pt; font-weight: bold; color: black;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 3px 0; width: 50mm;">OC:</td>
+                                        <td style="padding: 3px 0;"><span t-field="doc.mars_oc"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 3px 0;">ITEM:</td>
+                                        <td style="padding: 3px 0;"><span t-field="doc.mars_item"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 3px 0;">FECHA DE EMISIÓN:</td>
+                                        <td style="padding: 3px 0;"><span t-field="doc.mars_emission_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 3px 0;">INSPECTOR:</td>
+                                        <td style="padding: 3px 0;"><span t-field="doc.mars_inspector"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 3px 0;">CLIENTE:</td>
+                                        <td style="padding: 3px 0;"><span t-field="doc.mars_client_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 3px 0;">NORMA APLICABLE:</td>
+                                        <td style="padding: 3px 0;"><span t-field="doc.mars_applicable_norm"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 3px 0;">DIAGNOSTICO:</td>
+                                        <td style="padding: 3px 0;"><span t-field="doc.mars_diagnosis"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagina-interna">
+                    <h2 style="border-bottom: 1px solid black;">Resultados de la Inspeccion</h2>
+                    <p>Aqui comenzara el contenido de las siguientes hojas...</p>
+                </div>
+
+            </t>
+        </t>
+    </template>
+</odoo>

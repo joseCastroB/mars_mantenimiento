@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_maintenance_request_photo,maintenance.request.photo,model_maintenance_request_photo,base.group_user,1,1,1,1
+access_maintenance_request_worker,maintenance.request.worker,model_maintenance_request_worker,base.group_user,1,1,1,1
+access_maintenance_request_electrical,maintenance.request.electrical.data,model_maintenance_request_electrical_data,base.group_user,1,1,1,1

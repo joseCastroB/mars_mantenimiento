@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_equipment_request_view_form_inherit_mars" model="ir.ui.view">
+        <field name="name">maintenance.request.form.inherit.mars</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- 1. Hacemos que el campo 'name' (Solicitud) sea de solo lectura -->
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <!-- 2. Insertamos el nuevo Título de la solicitud dentro del bloque de título (oe_title) -->
+            <xpath expr="//div[hasclass('oe_title')]" position="inside">
+                <label for="mars_title" string="Título de la solicitud" class="mt-2"/>
+                <h1>
+                    <field name="mars_title" placeholder="Por ejemplo, no funciona la pantalla"/>
+                </h1>
+            </xpath>
+
+            <!-- Ocultamos el campo nativo de un solo equipo -->
+            <xpath expr="//field[@name='equipment_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <!-- Insertamos nuestro campo múltiple -->
+            <xpath expr="//field[@name='equipment_id']" position="after">
+                <field name="mars_equipment_ids" widget="many2many_tags" options="{'no_create': True}"/>
+            </xpath>
+
+            <xpath expr="//field[@name='maintenance_type']" position="after">
+                <separator string="Datos de Certificación"/>
+                
+                <field name="mars_oc" placeholder="Ej: 490256173417"/>
+                <field name="mars_item" placeholder="Ej: MP NOVIEMBRE TECLE..."/>
+                <field name="mars_emission_date"/>
+                <field name="mars_inspector" placeholder="Ej: ROYER AGUILAR GUTIERREZ"/>
+                <field name="mars_client_id" placeholder="Seleccione un cliente..."/>
+                <field name="mars_applicable_norm"/>
+                <field name="mars_diagnosis" placeholder="Ej: OPERATIVO SIN RESTRICCIONES"/>
+            </xpath>
+
+            <!-- Agregamos la pestaña de Registro Fotográfico -->
+            <xpath expr="//notebook" position="inside">
+            
+                <page string="Personal Asignado" name="page_workers">
+                    <field name="mars_worker_ids">
+                        <!-- editable="bottom" permite agregar filas directamente en la tabla sin abrir pop-ups -->
+                        <list editable="bottom">
+                            <field name="employee_id" options="{'no_create': True}"/>
+                            <field name="job_title" placeholder="Ej: Supervisor, Técnico Eléctrico..."/>
+                        </list>
+                    </field>
+                </page>
+
+                <page string="Registro Fotográfico" name="page_photos_segmented">
+                    <field name="mars_photo_ids" mode="kanban">
+                        <kanban records_draggable="false">
+                            <field name="id"/>
+                            <field name="equipment_id"/>
+                            <field name="mars_sequence"/>
+                            <field name="subtitle"/>
+                            <field name="image"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_global_click p-0" style="width: 220px; border-radius: 8px; overflow: hidden; border: 1px solid #ced4da; margin: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        
+                                        <div style="background-color: #343a40; color: white; padding: 6px; font-size: 11px; font-weight: bold; text-align: center; text-transform: uppercase;">
+                                            <field name="equipment_id"/>
+                                        </div>
+                                        
+                                        <div class="o_kanban_image_wrapper" style="text-align: center; padding: 10px; position: relative; background-color: #ffffff;">
+                                            <div style="position: absolute; top: 10px; left: 10px; background: #28a745; color: white; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 14px; z-index: 10; box-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+                                                <t t-esc="record.mars_sequence.raw_value"/>
+                                            </div>
+                                            <img t-att-src="kanban_image('maintenance.request.photo', 'image', record.id.raw_value)" 
+                                                style="max-width: 100%; height: 140px; object-fit: cover; border-radius: 4px;"/>
+                                        </div>
+                                        
+                                        <div style="padding: 10px; text-align: center; border-top: 1px solid #eeeeee; background-color: #f8f9fa;">
+                                            <strong style="color: #333333;"><field name="subtitle"/></strong>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                        
+                        <form>
+                            <sheet>
+                                <group>
+                                    <field name="equipment_id" domain="[('id', 'in', parent.mars_equipment_ids)]" options="{'no_create': True}" required="1"/>
+                                    <field name="subtitle" placeholder="Ej: Estado inicial del cable" required="1"/>
+                                    <field name="image" widget="image" class="oe_avatar" options="{'size': [400, 400]}"/>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+                
+                <page string="Acta de Conformidad" name="page_acta">
+                    <field name="mars_acta_ids" mode="kanban" context="{'default_photo_type': 'acta'}">
+                        
+                        <kanban>
+                            <field name="id"/>
+                            <field name="image"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_global_click p-0" style="width: 200px; border-radius: 8px; overflow: hidden; border: 1px solid #ced4da; margin: 8px;">
+                                        <div class="o_kanban_image_wrapper" style="text-align: center; padding: 5px;">
+                                            <img t-att-src="kanban_image('maintenance.request.photo', 'image', record.id.raw_value)" 
+                                                style="max-width: 100%; height: 180px; object-fit: cover; border-radius: 4px;"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                        <form>
+                            <sheet>
+                                <group>
+                                    <field name="image" widget="image" class="oe_avatar" options="{'size': [400, 400]}" nolabel="1"/>
+                                </group>
+                            </sheet>
+                        </form>
+                        </field>
+                </page>
+
+                <page string="Inspección de Gancho" name="page_gancho">
+                    <field name="mars_gancho_ids" mode="kanban" context="{'default_photo_type': 'gancho'}">
+                        
+                        <kanban>
+                            <field name="id"/>
+                            <field name="image"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_global_click p-0" style="width: 200px; border-radius: 8px; overflow: hidden; border: 1px solid #ced4da; margin: 8px;">
+                                        <div class="o_kanban_image_wrapper" style="text-align: center; padding: 5px;">
+                                            <img t-att-src="kanban_image('maintenance.request.photo', 'image', record.id.raw_value)" 
+                                                style="max-width: 100%; height: 180px; object-fit: cover; border-radius: 4px;"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                        <form>
+                            <sheet>
+                                <group>
+                                    <field name="image" widget="image" class="oe_avatar" options="{'size': [400, 400]}" nolabel="1"/>
+                                </group>
+                            </sheet>
+                        </form>
+                        </field>
+                </page>
+                
+                <page string="Medidas Eléctricas" name="page_electrical">
+                
+                    <field name="mars_electrical_ids" mode="tree,form">
+                        
+                        <list string="Medidas Eléctricas" create="0" delete="0">
+                            <field name="equipment_id"/>
+                            <field name="tension_nominal"/>
+                            <field name="corriente_datos"/>
+                        </list>
+                        
+                        <form string="Llenar Medidas">
+                            <sheet>
+                                <h2 class="text-primary mb-3">
+                                    Equipo: <field name="equipment_id" readonly="1" options="{'no_open': True}"/>
+                                </h2>
+                                
+                                <group col="2">
+                                    <group string="TENSIÓN DE ALIMENTACIÓN" style="border: 1px solid #28a745; padding: 10px; border-radius: 5px;">
+                                        <field name="tension_nominal" string="VALOR (General)"/>
+                                        <field name="tension_l1_l2" string="FASES L1-L2 (V)"/>
+                                        <field name="tension_l1_l3" string="FASES L1-L3 (V)"/>
+                                        <field name="tension_l2_l3" string="FASES L2-L3 (V)"/>
+                                    </group>
+
+                                    <group string="MEDIDAS DE CORRIENTE" style="border: 1px solid #28a745; padding: 10px; border-radius: 5px;">
+                                        <field name="corriente_datos" string="DATOS (Movimiento)"/>
+                                        <field name="corriente_l1" string="LÍNEA L1 (A)"/>
+                                        <field name="corriente_l2" string="LÍNEA L2 (A)"/>
+                                        <field name="corriente_l3" string="LÍNEA L3 (A)"/>
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+
+                <page string="Conclusiones" name="page_conclusions">
+                    <!-- Usamos el campo directo, Odoo detectará que es HTML y mostrará la barra de herramientas -->
+                    <field name="mars_conclusions" placeholder="Ej: Se concluye que el equipo opera con normalidad. Se recomienda el cambio de filtro en 3 meses..."/>
+                </page>
+                
+                <page string="Certificado del Inspector" name="page_inspector_certificate">
+                    <sheet>
+                        <div class="oe_title mb-4">
+                            <h3 class="text-primary">Adjuntar Certificado o Fotocheck</h3>
+                            <p class="text-muted">Formatos permitidos: PDF, JPG, PNG, etc.</p>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="mars_inspector_certificate_name" invisible="1"/>
+                                
+                                <field name="mars_inspector_certificate" 
+                                    filename="mars_inspector_certificate_name" 
+                                    string="Archivo del Certificado"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </page>
+
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

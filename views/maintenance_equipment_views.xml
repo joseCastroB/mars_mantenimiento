@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_maintenance_equipment_form_inherit_mars" model="ir.ui.view">
+        <field name="name">maintenance.equipment.form.inherit.mars</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//notebook" position="inside">
+                <page string="Especificaciones MARS" name="mars_specs">
+                    <group>
+                        <group string="Datos Técnicos">
+                            <field name="mars_marca"/>
+                            <field name="mars_capacidad"/>
+                            <field name="mars_ramales"/>
+                            <field name="mars_voltaje_fuerza"/>
+                            <field name="mars_tipo_alimentacion"/>
+                            <field name="mars_tipo_control"/>
+                        </group>
+                        <group string="Placa del Equipo">
+                            <field name="mars_placa_imagen" widget="image" class="oe_avatar" options="{'size': [250, 250]}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>

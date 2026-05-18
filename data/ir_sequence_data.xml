@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate="1" asegura que si actualizas el módulo, no se reinicie el contador a 0 -->
+    <data noupdate="1">
+        <record id="seq_maintenance_request_mars" model="ir.sequence">
+            <field name="name">Secuencia Solicitud MARS</field>
+            <field name="code">maintenance.request.mars</field>
+            <field name="prefix">MARS - </field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>
