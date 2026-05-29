@@ -55,7 +55,7 @@
                 </page>
 
                 <page string="Registro Fotográfico" name="page_photos_segmented">
-                    <field name="mars_photo_ids" mode="kanban">
+                    <field name="mars_photo_ids" mode="kanban" context="{'default_photo_type': 'general'}">
                         <kanban records_draggable="false">
                             <field name="id"/>
                             <field name="equipment_id"/>
@@ -92,6 +92,7 @@
                                     <field name="equipment_id" domain="[('id', 'in', parent.mars_equipment_ids)]" options="{'no_create': True}" required="1"/>
                                     <field name="subtitle" placeholder="Ej: Estado inicial del cable" required="1"/>
                                     <field name="image" widget="image" class="oe_avatar" options="{'size': [400, 400]}"/>
+                                    <field name="photo_type" invisible="1"/>
                                 </group>
                             </sheet>
                         </form>
@@ -119,6 +120,7 @@
                             <sheet>
                                 <group>
                                     <field name="image" widget="image" class="oe_avatar" options="{'size': [400, 400]}" nolabel="1"/>
+                                    <field name="photo_type" invisible="1"/>
                                 </group>
                             </sheet>
                         </form>
@@ -146,6 +148,7 @@
                             <sheet>
                                 <group>
                                     <field name="image" widget="image" class="oe_avatar" options="{'size': [400, 400]}" nolabel="1"/>
+                                    <field name="photo_type" invisible="1"/>
                                 </group>
                             </sheet>
                         </form>

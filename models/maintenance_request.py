@@ -148,7 +148,8 @@ class MaintenanceRequest(models.Model):
     mars_photo_ids = fields.One2many(
         'maintenance.request.photo',
         'request_id',
-        string='Registro Fotográfico'
+        string='Registro Fotográfico',
+        domain=[('photo_type', '=', 'general')]
     )
 
     # NUEVO: Numeración en tiempo real para las fotos

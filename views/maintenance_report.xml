@@ -32,41 +32,84 @@
             
             <style>
                 * { box-sizing: border-box !important; }
-                body, html, div.article { margin: 0 !important; padding: 0 !important; }
+                body, html, div.article { 
+                    margin: 0 !important; 
+                    padding: 0 !important; 
+                    background-color: white; 
+                }
                 
-                /* Carátula ajustada a 296mm para matar el desbordamiento de wkhtmltopdf */
-                .portada-estricta {
+                /* CONTENEDOR DE PORTADA (Sin saltos de pagina internos, tamaño congelado) */
+                .pagina-portada {
                     position: relative;
-                    width: 210mm !important;
-                    height: 278mm !important;
-                    max-width: 210mm !important;
-                    max-height: 278 mm !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    page-break-after: always;
-                    overflow: hidden; /* Esto guillotina el milímetro extra */
+                    width: 210mm;
+                    height: 278mm; /* 1mm menos que el A4 para obligar a que entre en 1 hoja */
+                    overflow: hidden; /* Corta cualquier pixel sobrante */
                     font-family: 'Arial', sans-serif;
                 }
 
+                /* CONTENEDOR DE PAGINAS INTERNAS */
                 .pagina-interna {
-                    width: 210mm !important;
-                    padding: 20mm !important;
+                    position: relative;
+                    width: 210mm;
+                    height: 278mm;
+                    overflow: hidden;
                     font-family: 'Arial', sans-serif;
+                    color: black;
+                }
+
+                /* AREA SEGURA PARA MARGENES */
+                .contenido-margen {
+                    width: 100%;
+                    height: 100%;
+                    padding: 20mm 20mm 25mm 20mm;
+                }
+
+                /* TABLAS DEL REPORTE */
+                .tabla-caracteristicas {
+                    width: 80%;
+                    margin: 0 auto;
+                    border-collapse: collapse;
+                    font-size: 13px;
+                }
+                .tabla-caracteristicas td {
+                    border: 1px solid black;
+                    padding: 8px;
+                }
+                .tabla-caracteristicas td:first-child {
+                    font-weight: bold;
+                    text-align: right;
+                    width: 40%;
+                }
+
+                .tabla-fotos {
+                    width: 100%;
+                    border-collapse: collapse;
+                    border: 2px solid black;
+                    text-align: center;
+                }
+                .tabla-fotos td {
+                    border: 2px solid black;
+                    padding: 10px;
+                    width: 50%;
+                    vertical-align: top;
+                    height: 220px;
+                }
+                .foto-titulo {
+                    font-weight: bold;
+                    font-size: 12px;
+                    margin-top: 10px;
                 }
             </style>
 
             <t t-foreach="docs" t-as="doc">
                 
-                <div class="portada-estricta">
+                <div class="pagina-portada" t-translation="off">
                     
                     <img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/report_cover_base.jpg" 
-                         style="position: absolute; top: 0; left: 0; width: 210mm !important; height: 296mm !important; z-index: 1;"/>
+                         style="position: absolute; top: 0; left: 0; width: 210mm; height: 278mm; z-index: 1;"/>
 
-                    <div style="position: absolute; top: 0; left: 0; width: 210mm; height: 296mm; z-index: 10;">
+                    <div style="position: absolute; top: 0; left: 0; width: 210mm; height: 278mm; z-index: 10;">
                         
-                    <!--   <img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" 
-                             style="position: absolute; top: 25mm; left: 20mm; width: 45mm;"/> 
-                    -->
                         <img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" 
                              style="position: absolute; top: 15mm; right: 25mm; width: 35mm;"/>
 
@@ -74,36 +117,419 @@
                             <span t-field="doc.mars_client_id.name"/>
                         </div>
 
-                        <div style="position: absolute; bottom: 45mm; left: 15mm; width: 140mm; font-size: 11pt; font-weight: bold; color: black;">
+                        <div style="position: absolute; bottom: 25mm; left: 15mm; width: 140mm; font-size: 11pt; font-weight: bold; color: black;">
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tbody>
+                                    <tr><td style="padding: 3px 0; width: 50mm;">OC:</td><td style="padding: 3px 0;"><span t-field="doc.mars_oc"/></td></tr>
+                                    <tr><td style="padding: 3px 0;">ITEM:</td><td style="padding: 3px 0;"><span t-field="doc.mars_item"/></td></tr>
+                                    <tr><td style="padding: 3px 0;">FECHA EMISION:</td><td style="padding: 3px 0;"><span t-field="doc.mars_emission_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></td></tr>
+                                    <tr><td style="padding: 3px 0;">INSPECTOR:</td><td style="padding: 3px 0;"><span t-field="doc.mars_inspector"/></td></tr>
+                                    <tr><td style="padding: 3px 0;">CLIENTE:</td><td style="padding: 3px 0;"><span t-field="doc.mars_client_id.name"/></td></tr>
+                                    <tr><td style="padding: 3px 0;">NORMA APLICABLE:</td><td style="padding: 3px 0;"><span t-field="doc.mars_applicable_norm"/></td></tr>
+                                    <tr><td style="padding: 3px 0;">DIAGNOSTICO TECNICO:</td><td style="padding: 3px 0;"><span t-field="doc.mars_diagnosis"/></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagina-interna" style="page-break-before: always;" t-translation="off">
+                    <div class="contenido-margen">
+                        
+                        <div style="width: 100%; border-bottom: 3px solid black; padding-bottom: 10px; margin-bottom: 30px;">
+                            <table style="width: 100%;">
+                                <tbody>
                                     <tr>
-                                        <td style="padding: 3px 0; width: 50mm;">OC:</td>
-                                        <td style="padding: 3px 0;"><span t-field="doc.mars_oc"/></td>
+                                        <td style="text-align: left; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" style="height: 35px;"/></td>
+                                        <td style="text-align: center; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_demag.png" style="height: 35px;"/></td>
+                                        <td style="text-align: right; width: 50%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" style="height: 90px;"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="font-size: 14px; line-height: 1.5; text-align: justify;">
+                            <p style="margin-bottom: 20px;">
+                                <strong>Lima, <span t-field="doc.mars_emission_date" t-options="{'widget': 'date', 'format': 'dd'}"/> de <span t-field="doc.mars_emission_date" t-options="{'widget': 'date', 'format': 'MMMM'}"/> del <span t-field="doc.mars_emission_date" t-options="{'widget': 'date', 'format': 'yyyy'}"/></strong>
+                            </p>
+                            
+                            <p style="margin-bottom: 20px;"><strong>Señores:</strong></p>
+                            
+                            <p style="margin-bottom: 20px;">
+                                <strong style="font-size: 16px; text-transform: uppercase;"><span t-field="doc.mars_client_id.name"/></strong>
+                            </p>
+
+                            <p style="margin-bottom: 20px;">
+                                El presente documento detalla el proceso del servicio de mantenimiento <span t-field="doc.mars_maintenance_type"/> ejecutado en sus instalaciones la fecha <span t-field="doc.mars_execution_date" t-options="{'widget': 'date', 'format': 'dd'}"/> de <span t-field="doc.mars_execution_date" t-options="{'widget': 'date', 'format': 'MMMM'}"/>.
+                            </p>
+
+                            <p style="margin-bottom: 40px;">
+                                Confiamos en que nuestro aporte como especialistas en equipos de izaje permita agregar valor a su negocio, maximizando la confiabilidad y disponibilidad de sus equipos, al operar bajo los mas estrictos estandares de seguridad y funcionamiento establecidos internacionalmente.
+                            </p>
+
+                            <p>Atentamente,</p>
+                        </div>
+
+                        <div style="position: absolute; bottom: 15mm; left: 20mm; right: 20mm; border-top: 3px solid black; padding-top: 10px;">
+                            <table style="width: 100%; font-size: 12px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="text-align: left; width: 38%;">proyectos@marsperu.com</td>
+                                        <td style="text-align: center; width: 32%;">www.marsperu.com</td>
+                                        <td style="text-align: right; width: 30%;">+51 936830534</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+                <t t-foreach="doc.mars_equipment_ids" t-as="equipment">
+                    
+                    <div class="pagina-interna" style="page-break-before: always;" t-translation="off">
+                        <div class="contenido-margen">
+                            
+                            <div style="width: 100%; border-bottom: 4px solid black; padding-bottom: 10px; margin-bottom: 30px;">
+                                <table style="width: 100%;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" style="height: 35px;"/></td>
+                                            <td style="text-align: center; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_demag.png" style="height: 35px;"/></td>
+                                            <td style="text-align: right; width: 50%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" style="height: 90px;"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h3 style="font-weight: bold; margin-bottom: 25px;">Caracteristicas del equipo</h3>
+
+                            <table class="tabla-caracteristicas">
+                                <tbody>
+                                    <tr><td>EQUIPO:</td><td><span t-field="equipment.name"/></td></tr>
+                                    <tr><td>MARCA:</td><td><span t-field="equipment.mars_marca"/></td></tr>
+                                    <tr><td>SERIE:</td><td><span t-field="equipment.serial_no"/></td></tr>
+                                    <tr><td>CAPACIDAD:</td><td><span t-field="equipment.mars_capacidad"/></td></tr>
+                                    <tr><td>RAMALES:</td><td><span t-field="equipment.mars_ramales"/></td></tr>
+                                    <tr><td>VOLTAJE DE FUERZA:</td><td><span t-field="equipment.mars_voltaje_fuerza"/></td></tr>
+                                    <tr><td>TIPO DE ALIMENTACION:</td><td><span t-field="equipment.mars_tipo_alimentacion"/></td></tr>
+                                    <tr><td>TIPO DE CONTROL:</td><td><span t-field="equipment.mars_tipo_control"/></td></tr>
+                                </tbody>
+                            </table>
+
+                            <div style="text-align: center; margin-top: 40px;" t-if="equipment.mars_placa_imagen">
+                                <img t-att-src="image_data_uri(equipment.mars_placa_imagen)" style="max-height: 250px; max-width: 100%; border: 1px solid #ccc;"/>
+                            </div>
+
+                            <div style="position: absolute; bottom: 15mm; left: 20mm; right: 20mm; border-top: 4px solid black; padding-top: 10px;">
+                                <table style="width: 100%; font-size: 12px;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; width: 38%;">proyectos@marsperu.com</td>
+                                            <td style="text-align: center; width: 32%;">www.marsperu.com</td>
+                                            <td style="text-align: right; width: 30%;">+51 936830534</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <t t-set="equip_photos" t-value="doc.mars_photo_ids.filtered(lambda p: p.equipment_id.id == equipment.id)"/>
+                    
+                    <div class="pagina-interna" style="page-break-before: always;" t-translation="off" t-if="equip_photos">
+                        <div class="contenido-margen">
+                            
+                            <div style="width: 100%; border-bottom: 4px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                                <table style="width: 100%;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" style="height: 35px;"/></td>
+                                            <td style="text-align: center; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_demag.png" style="height: 35px;"/></td>
+                                            <td style="text-align: right; width: 50%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" style="height: 90px;"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">1. REGISTRO FOTOGRAFICO</div>
+
+                            <div style="width: 100%;">
+                                <t t-foreach="equip_photos" t-as="photo">
+                                    <div style="float: left; width: 50%; border: 1px solid black; padding: 10px; text-align: center; height: 230px; box-sizing: border-box;">
+                                        
+                                        <div style="text-align: right; font-weight: bold; margin-bottom: 5px;">
+                                            <span t-esc="str(photo.mars_sequence).zfill(2)"/>.
+                                        </div>
+                                        
+                                        <div style="height: 140px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                            <img t-att-src="image_data_uri(photo.image)" style="max-height: 130px; max-width: 100%;"/>
+                                        </div>
+                                        
+                                        <div style="font-weight: bold; font-size: 12px; margin-top: 10px;">
+                                            <span t-field="photo.subtitle"/>
+                                        </div>
+                                        
+                                    </div>
+                                </t>
+                            </div>
+
+                            <div style="position: absolute; bottom: 15mm; left: 20mm; right: 20mm; border-top: 3px solid black; padding-top: 10px;">
+                                <table style="width: 100%; font-size: 12px;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; width: 38%;">proyectos@marsperu.com</td>
+                                            <td style="text-align: center; width: 32%;">www.marsperu.com</td>
+                                            <td style="text-align: right; width: 30%;">+51 936830534</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </t>
+
+                <t t-foreach="doc.mars_acta_ids" t-as="acta">
+                    <div class="pagina-interna" t-translation="off">
+                        <div class="contenido-margen">
+                            
+                            <div style="width: 100%; border-bottom: 4px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                                <table style="width: 100%;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" style="height: 35px;"/></td>
+                                            <td style="text-align: center; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_demag.png" style="height: 35px;"/></td>
+                                            <td style="text-align: right; width: 50%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" style="height: 90px;"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 15px; text-transform: uppercase;">
+                                2.- ACTA DE CONFORMIDAD
+                            </div>
+
+                            <div style="text-align: center; width: 100%;">
+                                <img t-att-src="image_data_uri(acta.image)" style="max-width: 100%; max-height: 190mm; margin: 0 auto;"/>
+                            </div>
+
+                            <div style="position: absolute; bottom: 10mm; left: 20mm; right: 20mm; border-top: 3px solid black; padding-top: 10px;">
+                                <table style="width: 100%; font-size: 12px;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; width: 38%;">proyectos@marsperu.com</td>
+                                            <td style="text-align: center; width: 32%;">www.marsperu.com</td>
+                                            <td style="text-align: right; width: 30%;">+51 936830534</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </t> 
+
+                <t t-foreach="doc.mars_gancho_ids" t-as="gancho">
+                    <div class="pagina-interna" t-translation="off">
+                        <div class="contenido-margen">
+                            
+                            <div style="width: 100%; border-bottom: 4px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                                <table style="width: 100%;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" style="height: 35px;"/></td>
+                                            <td style="text-align: center; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_demag.png" style="height: 35px;"/></td>
+                                            <td style="text-align: right; width: 50%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" style="height: 90px;"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 15px; text-transform: uppercase;">
+                                3.- INSPECCION DEL GANCHO
+                            </div>
+
+                            <div style="width: 100%; height: 180mm; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: white;">
+                                <img t-att-src="image_data_uri(gancho.image)" style="max-width: 100%; max-height: 100%; object-fit: contain; margin: 0 auto;"/>
+                            </div>
+
+                            <div style="position: absolute; bottom: 10mm; left: 20mm; right: 20mm; border-top: 3px solid black; padding-top: 10px;">
+                                <table style="width: 100%; font-size: 12px;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; width: 38%;">proyectos@marsperu.com</td>
+                                            <td style="text-align: center; width: 32%;">www.marsperu.com</td>
+                                            <td style="text-align: right; width: 30%;">+51 936830534</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </t>
+
+                <div class="pagina-interna" t-translation="off">
+                    <div class="contenido-margen">
+                        
+                        <div style="width: 100%; border-bottom: 4px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                            <table style="width: 100%;">
+                                <tbody>
+                                    <tr>
+                                        <td style="text-align: left; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" style="height: 35px;"/></td>
+                                        <td style="text-align: center; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_demag.png" style="height: 35px;"/></td>
+                                        <td style="text-align: right; width: 50%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" style="height: 90px;"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="font-weight: bold; font-size: 14px; margin-bottom: 15px; text-transform: uppercase;">
+                            PERSONAL ENCARGADO DE MANTENIMIENTO
+                        </div>
+
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 13px;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 2px solid black; padding: 8px; text-align: center; width: 10%; font-weight: bold;">ITEM</th>
+                                    <th style="border: 2px solid black; padding: 8px; text-align: center; width: 45%; font-weight: bold;">NOMBRE DEL RESPONSABLE</th>
+                                    <th style="border: 2px solid black; padding: 8px; text-align: center; width: 45%; font-weight: bold;">CARGO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="worker_idx" t-value="1"/>
+                                <t t-foreach="doc.mars_worker_ids" t-as="worker">
+                                    <tr>
+                                        <td style="border: 1px solid black; padding: 8px; text-align: center;"><t t-esc="worker_idx"/></td>
+                                        <td style="border: 1px solid black; padding: 8px;"><span t-field="worker.employee_id.name"/></td>
+                                        <td style="border: 1px solid black; padding: 8px;"><span t-field="worker.job_title"/></td>
+                                    </tr>
+                                    <t t-set="worker_idx" t-value="worker_idx + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div style="font-size: 13px; line-height: 1.5; text-align: justify;">
+                            <span t-field="doc.mars_conclusions"/>
+                        </div>
+
+                        <div style="position: absolute; bottom: 10mm; left: 20mm; right: 20mm; border-top: 3px solid black; padding-top: 10px;">
+                            <table style="width: 100%; font-size: 12px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="text-align: left; width: 38%;">proyectos@marsperu.com</td>
+                                        <td style="text-align: center; width: 32%;">www.marsperu.com</td>
+                                        <td style="text-align: right; width: 30%;">+51 936830534</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="pagina-interna" t-translation="off">
+                    <div class="contenido-margen">
+                        
+                        <div style="width: 100%; border-bottom: 4px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                            <table style="width: 100%;">
+                                <tbody>
+                                    <tr>
+                                        <td style="text-align: left; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" style="height: 35px;"/></td>
+                                        <td style="text-align: center; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_demag.png" style="height: 35px;"/></td>
+                                        <td style="text-align: right; width: 50%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" style="height: 90px;"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4 style="font-weight: bold; text-transform: uppercase; margin-bottom: 10px;">PERSONAL ENCARGADO DE MANTENIMIENTO</h4>
+
+                        <t t-foreach="doc.mars_electrical_ids" t-as="data">
+                            <h4 style="font-weight: bold; margin-bottom: 5px;"><t t-esc="data.equipment_id.name"/></h4>
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 11px; text-align: center;">
+                                <thead>
+                                    <tr style="background-color: #28a745; color: white;">
+                                        <th colspan="3" style="border: 1px solid black; padding: 5px;">TENSION DE ALIMENTACION</th>
+                                        <th colspan="3" style="border: 1px solid black; padding: 5px;">MEDIDAS DE CORRIENTE</th>
+                                    </tr>
+                                    <tr style="background-color: #28a745; color: white;">
+                                        <th style="border: 1px solid black; padding: 5px;">VALOR</th>
+                                        <th style="border: 1px solid black; padding: 5px;">FASES</th>
+                                        <th style="border: 1px solid black; padding: 5px;">VALORES (V)</th>
+                                        <th style="border: 1px solid black; padding: 5px;">DATOS</th>
+                                        <th style="border: 1px solid black; padding: 5px;">LINEA</th>
+                                        <th style="border: 1px solid black; padding: 5px;">VALORES (A)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="3" style="border: 1px solid black; vertical-align: middle;"><span t-field="data.tension_nominal"/></td>
+                                        <td style="border: 1px solid black; padding: 2px;">L1-L2</td>
+                                        <td style="border: 1px solid black; padding: 2px;"><span t-field="data.tension_l1_l2"/></td>
+                                        <td rowspan="3" style="border: 1px solid black; vertical-align: middle;"><span t-field="data.corriente_datos"/></td>
+                                        <td style="border: 1px solid black; padding: 2px;">L1</td>
+                                        <td style="border: 1px solid black; padding: 2px;"><span t-field="data.corriente_l1"/></td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 3px 0;">ITEM:</td>
-                                        <td style="padding: 3px 0;"><span t-field="doc.mars_item"/></td>
+                                        <td style="border: 1px solid black; padding: 2px;">L1-L3</td>
+                                        <td style="border: 1px solid black; padding: 2px;"><span t-field="data.tension_l1_l3"/></td>
+                                        <td style="border: 1px solid black; padding: 2px;">L2</td>
+                                        <td style="border: 1px solid black; padding: 2px;"><span t-field="data.corriente_l2"/></td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 3px 0;">FECHA DE EMISIÓN:</td>
-                                        <td style="padding: 3px 0;"><span t-field="doc.mars_emission_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/></td>
+                                        <td style="border: 1px solid black; padding: 2px;">L2-L3</td>
+                                        <td style="border: 1px solid black; padding: 2px;"><span t-field="data.tension_l2_l3"/></td>
+                                        <td style="border: 1px solid black; padding: 2px;">L3</td>
+                                        <td style="border: 1px solid black; padding: 2px;"><span t-field="data.corriente_l3"/></td>
                                     </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: center;">
+                            <thead>
+                                <tr style="background-color: #e9ecef;">
+                                    <th colspan="4" style="border: 1px solid black; padding: 5px; font-weight: bold;">VALORES TEORICOS ACEPTABLES</th>
+                                </tr>
+                                <tr style="background-color: #f2f2f2;">
+                                    <th style="border: 1px solid black; padding: 5px;">Descripcion</th>
+                                    <th style="border: 1px solid black; padding: 5px;">Valores</th>
+                                    <th style="border: 1px solid black; padding: 5px;">Resultado</th>
+                                    <th style="border: 1px solid black; padding: 5px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 5px;">Voltaje</td>
+                                    <td style="border: 1px solid black; padding: 5px;">440 - 460</td>
+                                    <td style="border: 1px solid black; padding: 5px;">Conforme</td>
+                                    <td style="border: 1px solid black; padding: 5px;">VERDADERO</td>
+                                </tr>
+                                 <tr>
+                                    <td style="border: 1px solid black; padding: 5px;">Corriente Polipaste</td>
+                                    <td style="border: 1px solid black; padding: 5px;">2.85 A - 5.2 A</td>
+                                    <td style="border: 1px solid black; padding: 5px;">CONFORME</td>
+                                    <td style="border: 1px solid black; padding: 5px;">VERDADERO</td>
+                                </tr>
+                                 <tr>
+                                    <td style="border: 1px solid black; padding: 5px;">Corriente Trolley</td>
+                                    <td style="border: 1px solid black; padding: 5px;">N/A</td>
+                                    <td style="border: 1px solid black; padding: 5px;">N/A</td>
+                                    <td style="border: 1px solid black; padding: 5px;">N/A</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="position: absolute; bottom: 10mm; left: 20mm; right: 20mm; border-top: 3px solid black; padding-top: 10px;">
+                            <table style="width: 100%; font-size: 12px;">
+                                <tbody>
                                     <tr>
-                                        <td style="padding: 3px 0;">INSPECTOR:</td>
-                                        <td style="padding: 3px 0;"><span t-field="doc.mars_inspector"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 3px 0;">CLIENTE:</td>
-                                        <td style="padding: 3px 0;"><span t-field="doc.mars_client_id.name"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 3px 0;">NORMA APLICABLE:</td>
-                                        <td style="padding: 3px 0;"><span t-field="doc.mars_applicable_norm"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 3px 0;">DIAGNOSTICO:</td>
-                                        <td style="padding: 3px 0;"><span t-field="doc.mars_diagnosis"/></td>
+                                        <td style="text-align: left; width: 38%;">proyectos@marsperu.com</td>
+                                        <td style="text-align: center; width: 32%;">www.marsperu.com</td>
+                                        <td style="text-align: right; width: 30%;">+51 936830534</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -111,11 +537,37 @@
                     </div>
                 </div>
 
-                <div class="pagina-interna">
-                    <h2 style="border-bottom: 1px solid black;">Resultados de la Inspeccion</h2>
-                    <p>Aqui comenzara el contenido de las siguientes hojas...</p>
-                </div>
+                <t t-if="doc.mars_inspector_certificate">
+                    <div class="pagina-interna" t-translation="off">
+                        <div class="contenido-margen">
+                            <div style="width: 100%; border-bottom: 4px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                                <table style="width: 100%;"><tbody><tr>
+                                    <td style="text-align: left; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_donati.png" style="height: 35px;"/></td>
+                                    <td style="text-align: center; width: 33%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_demag.png" style="height: 35px;"/></td>
+                                    <td style="text-align: right; width: 50%;"><img src="http://127.0.0.1:8069/mars_mantenimiento/static/src/img/logo_mars.png" style="height: 90px;"/></td>
+                                </tr></tbody></table>
+                            </div>
+                            
+                            <h3 style="font-weight: bold; font-size: 14px; margin-bottom: 15px; text-transform: uppercase;">CERTIFICADO DEL INSPECTOR</h3>
 
+                            <div style="width: 100%; height: 180mm; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: white;">
+                                <img t-att-src="image_data_uri(doc.mars_inspector_certificate)" style="max-width: 100%; max-height: 100%; object-fit: contain; margin: 0 auto;"/>
+                            </div>
+
+                            <div style="position: absolute; bottom: 10mm; left: 20mm; right: 20mm; border-top: 3px solid black; padding-top: 10px;">
+                                <table style="width: 100%; font-size: 12px;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; width: 38%;">proyectos@marsperu.com</td>
+                                            <td style="text-align: center; width: 32%;">www.marsperu.com</td>
+                                            <td style="text-align: right; width: 30%;">+51 936830534</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
             </t>
         </t>
     </template>
