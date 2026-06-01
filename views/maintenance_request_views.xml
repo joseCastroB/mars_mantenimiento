@@ -214,6 +214,24 @@
                     </sheet>
                 </page>
 
+                <!-- Pestaña de Observaciones Finales -->
+                <page string="Observaciones Finales">
+                    <group>
+                        <field name="mars_final_observations" placeholder="Escriba aquí sus observaciones generales del servicio..."/>
+                        <!-- Este es el switch de Sí/No -->
+                        <field name="mars_used_parts" widget="boolean_toggle"/>
+                    </group>
+                    
+                    <!-- Esta es la tabla que aparece/desaparece mágicamente -->
+                    <!-- invisible="not mars_used_parts" significa: Ocultar si el switch está apagado -->
+                    <field name="mars_part_ids" invisible="not mars_used_parts">
+                        <list editable="bottom">
+                            <field name="name" placeholder="Ej. Rodaje SKF 6205..."/>
+                            <field name="quantity"/>
+                        </list>
+                    </field>
+                </page>
+
             </xpath>
 
         </field>

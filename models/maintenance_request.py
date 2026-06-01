@@ -33,7 +33,7 @@ class MaintenanceRequestPhoto(models.Model):
     equipment_id = fields.Many2one('maintenance.equipment', string='Equipo')
     
     # Nuevo campo para la numeración 1., 2., 3.
-    mars_sequence = fields.Integer(string='N°', default=0)
+    mars_sequence = fields.Integer(string='N°', compute='_compute_mars_sequence', store=True)
     
     image = fields.Image(string='Fotografía', required=True)
     subtitle = fields.Char(string='Subtítulo / Descripción')
@@ -84,6 +84,15 @@ class MaintenanceRequestElectricalData(models.Model):
          '¡Este equipo ya tiene una tabla de medidas asignada en esta solicitud!')
     ]
 
+# CREAMOS EL NUEVO MODELO PARA LA LISTA DE REPUESTOS
+class MarsMaintenancePart(models.Model):
+    _name = 'mars.maintenance.part'
+    _description = 'Repuestos Utilizados'
+
+    maintenance_id = fields.Many2one('maintenance.request', string='Mantenimiento')
+    name = fields.Char(string='Descripción del Repuesto', required=True)
+    quantity = fields.Float(string='Cantidad', default=1.0)
+
 class MaintenanceRequest(models.Model):
     _inherit = 'maintenance.request'
 
@@ -110,12 +119,19 @@ class MaintenanceRequest(models.Model):
     mars_diagnosis = fields.Char(string='Diagnóstico')
 
     # --- NUEVOS CAMPOS PARA LA PÁGINA 2 ---
-    mars_maintenance_type = fields.Selection([
-        ('preventivo', 'preventivo'),
-        ('correctivo', 'correctivo'),
-        ('predictivo', 'predictivo')
-    ], string='Tipo de Mantenimiento', default='preventivo')
-    
+    maintenance_type = fields.Selection(
+        selection_add=[
+            ('overhaul', 'Overhaul'),
+            ('inspective', 'Inspectivo'),
+            ('predictive', 'Predictivo'),
+        ],
+        ondelete={
+            'overhaul': 'set default',
+            'inspective': 'set default',
+            'predictive': 'set default',
+        }
+    )
+
     mars_execution_date = fields.Date(string='Fecha de Ejecución', default=fields.Date.context_today)
 
     # Relaciones one2many para el personal asignado y las fotos
@@ -238,3 +254,14 @@ class MaintenanceRequest(models.Model):
     # Campos para el Certificado del Inspector
     mars_inspector_certificate = fields.Binary(string='Certificado del Inspector', attachment=True)
     mars_inspector_certificate_name = fields.Char(string='Nombre del Certificado')
+
+    # Nuevos campos para Observaciones y Repuestos
+    mars_final_observations = fields.Text(string='Observaciones Finales')
+    mars_used_parts = fields.Boolean(string='¿Se utilizaron repuestos?', default=False)
+    
+    # Relación con la tabla de repuestos
+    mars_part_ids = fields.One2many(
+        'mars.maintenance.part', 
+        'maintenance_id', 
+        string='Lista de Repuestos'
+    )
