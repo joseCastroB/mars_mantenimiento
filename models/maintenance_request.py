@@ -109,6 +109,13 @@ class MaintenanceRequest(models.Model):
         help='Selecciona uno o varios equipos para esta solicitud.'
     )
 
+    # Campo para vincular con el CRM
+    mars_crm_lead_id = fields.Many2one(
+        'crm.lead', 
+        string='Oportunidad CRM',
+        help='Permite vincular esta solicitud a un Lead/Oportunidad del CRM.'
+    )
+
     # NUEVOS CAMPOS: Datos de Certificación / Inspección
     mars_oc = fields.Char(string='OC')
     mars_item = fields.Char(string='ITEM')

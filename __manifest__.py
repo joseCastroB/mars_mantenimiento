@@ -5,7 +5,7 @@
     'description': 'Añade campos técnicos específicos y fotografía de placa a los equipos de mantenimiento.',
     'category': 'Maintenance',
     'author': 'Jose Castro',
-    'depends': ['maintenance', 'hr'],
+    'depends': ['base','maintenance', 'hr', 'crm'],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',

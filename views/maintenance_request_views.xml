@@ -29,6 +29,11 @@
                 <field name="mars_equipment_ids" widget="many2many_tags" options="{'no_create': True}"/>
             </xpath>
 
+            <!-- Insertamos nuestro campo múltiple -->
+            <xpath expr="//field[@name='mars_equipment_ids']" position="after">
+                <field name="mars_crm_lead_id" options="{'no_create': True}"/>
+            </xpath>
+
             <xpath expr="//field[@name='maintenance_type']" position="after">
                 <separator string="Datos de Certificación"/>
                 
