@@ -241,4 +241,22 @@
 
         </field>
     </record>
+
+    <record id="mars_maintenance_request_view_kanban_inherit" model="ir.ui.view">
+        <field name="name">mars.maintenance.request.kanban.inherit</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_kanban"/>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//field[@name='name']" position="after">
+                
+                <div invisible="not mars_crm_lead_id" class="text-muted mt-1 mb-1" style="font-size: 12px; display: block;">
+                    <i class="fa fa-briefcase text-info" title="Oportunidad CRM" style="margin-right: 4px;"></i>
+                    <field name="mars_crm_lead_id"/>
+                </div>
+                
+            </xpath>
+            
+        </field>
+    </record>
 </odoo>
